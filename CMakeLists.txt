@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 2.8.3...3.20)
 project(g2o_catkin)
 
 find_package(catkin_simple REQUIRED)
@@ -6,14 +6,22 @@ catkin_simple(ALL_DEPS_REQUIRED)
 
 include(ExternalProject)
 
-file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include/g2o)
+file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include)
 
 ExternalProject_Add(g2o_src
-  GIT_REPOSITORY https://github.com/ffurrer/g2o.git
-  GIT_TAG fix/suitesparse_include
-  PREFIX ${CMAKE_CURRENT_BINARY_DIR}/g2o
-  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CATKIN_DEVEL_PREFIX} -DCMAKE_BUILD_TYPE=Release
-  -DBUILD_SHARED_LIBS=ON
+  GIT_REPOSITORY https://github.com/hellovuong/g2o.git
+  GIT_TAG master
+  UPDATE_COMMAND ""
+  #PATCH_COMMAND ""
+  CONFIGURE_COMMAND  cd ../g2o_src &&
+                     cmake -DCMAKE_BUILD_TYPE=Release .
+
+  BUILD_COMMAND cd ../g2o_src && make -j2
+  INSTALL_COMMAND 
+  mkdir -p ${CATKIN_DEVEL_PREFIX}/include/g2o/ &&
+  cp -r ../g2o_src/g2o/ ${CATKIN_DEVEL_PREFIX}/include/g2o/ &&
+  cp -r ../g2o_src/config.h ${CATKIN_DEVEL_PREFIX}/include/g2o/ &&
+  cp -r ../g2o_src/lib ${CATKIN_DEVEL_PREFIX}/lib/g2o
 )
 
 ExternalProject_Get_Property(g2o_src install_dir)
@@ -24,12 +32,6 @@ add_dependencies(${PROJECT_NAME} g2o_src)
 target_link_libraries(${PROJECT_NAME})
 cs_install()
 
-install(DIRECTORY ${CATKIN_DEVEL_PREFIX}/include/g2o
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN "*.h"
-  PATTERN ".git" EXCLUDE
-)
 
 cs_export(INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include/
   CFG_EXTRAS g2o-extras.cmake)
