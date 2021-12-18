@@ -4,7 +4,7 @@
   <description>g2o_catkin</description>
   <maintainer email="h.vuong@itmo.ru">Long Vuong</maintainer>
 
-  <license></license>
+  <license>MIT</license>
 
   <buildtool_depend>catkin</buildtool_depend>
   <buildtool_depend>catkin_simple</buildtool_depend>
